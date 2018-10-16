@@ -1,0 +1,36 @@
+{
+  "name": "lib-protobuf.js",
+  "version": "1.0.0",
+  "description": "Protobuf的js编解码库",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JiangJie/lib-protobuf.js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JiangJie/lib-protobuf.js/issues"
+  },
+  "homepage": "https://github.com/JiangJie/lib-protobuf.js#readme",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.1.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "gulp": "^4.0.0",
+    "gulp-util": "^3.0.8",
+    "rollupify": "^0.5.0",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.1.2"
+  }
+}
