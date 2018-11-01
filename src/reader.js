@@ -1,4 +1,5 @@
 import * as utf8 from './utf8';
+import LongBits from './longbits';
 
 // 2 ** 32 - 1
 const MAX_UINT32 = 4294967295;
@@ -12,6 +13,55 @@ const MAX_UINT32 = 4294967295;
  */
 function indexOutOfRange(reader, writelength) {
     return RangeError(`protobuf reader index out of range: ${reader.pos} + ${writelength || 1} > ${reader.len}`);
+}
+
+function readLongVarint() {
+    const bits = new LongBits(0, 0);
+    let i = 0;
+    if (this.len - this.pos > 4) {
+        for (; i < 4; ++i) {
+            // 1st..4th
+            bits.lo = (bits.lo | (this.buf[this.pos] & 127) << i * 7) >>> 0;
+            if (this.buf[this.pos++] < 128)
+                return bits;
+        }
+        // 5th
+        bits.lo = (bits.lo | (this.buf[this.pos] & 127) << 28) >>> 0;
+        bits.hi = (bits.hi | (this.buf[this.pos] & 127) >> 4) >>> 0;
+        if (this.buf[this.pos++] < 128)
+            return bits;
+        i = 0;
+    } else {
+        for (; i < 3; ++i) {
+            if (this.pos >= this.len)
+                throw indexOutOfRange(this);
+            // 1st..3th
+            bits.lo = (bits.lo | (this.buf[this.pos] & 127) << i * 7) >>> 0;
+            if (this.buf[this.pos++] < 128)
+                return bits;
+        }
+        // 4th
+        bits.lo = (bits.lo | (this.buf[this.pos++] & 127) << i * 7) >>> 0;
+        return bits;
+    }
+    if (this.len - this.pos > 4) {
+        for (; i < 5; ++i) {
+            // 6th..10th
+            bits.hi = (bits.hi | (this.buf[this.pos] & 127) << i * 7 + 3) >>> 0;
+            if (this.buf[this.pos++] < 128)
+                return bits;
+        }
+    } else {
+        for (; i < 5; ++i) {
+            if (this.pos >= this.len)
+                throw indexOutOfRange(this);
+            // 6th..10th
+            bits.hi = (bits.hi | (this.buf[this.pos] & 127) << i * 7 + 3) >>> 0;
+            if (this.buf[this.pos++] < 128)
+                return bits;
+        }
+    }
+    throw Error('invalid varint encoding');
 }
 
 /**
@@ -89,9 +139,29 @@ export default class Reader {
     }
 
     /**
+     * 从当前位置读一个uint64
+     *
+     * @returns {number} 读取结果
+     * @memberof Reader
+     */
+    uint64() {
+        return readLongVarint.call(this).toNumber(true);
+    }
+
+    /**
+     * 从当前位置读一个int64
+     *
+     * @returns {number} 读取结果
+     * @memberof Reader
+     */
+    int64() {
+        return readLongVarint.call(this).toNumber(false);
+    }
+
+    /**
      * 从当前位置读一个bool
      *
-     * @returns {boolean} 赌气结果
+     * @returns {boolean} 读取结果
      * @memberof Reader
      */
     bool() {

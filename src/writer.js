@@ -1,4 +1,5 @@
 import * as utf8 from './utf8';
+import LongBits from './longbits';
 
 /**
  * 空函数
@@ -54,55 +55,6 @@ function writeVarint64(value, buffer, pos) {
         value.lo = value.lo >>> 7;
     }
     buffer[_pos++] = value.lo;
-}
-
-/**
- * 模拟64位数字，处理超过uint32的情况
- *
- * @class LongBits
- */
-class LongBits {
-    /**
-     * Creates an instance of LongBits.
-     * @param {number} lo 低32位值
-     * @param {number} hi 高32位值
-     * @memberof LongBits
-     */
-    constructor(lo, hi) {
-        this.lo = lo >>> 0;
-        this.hi = hi >>> 0;
-    }
-
-    /**
-     * 根据value创建一个LongBits
-     *
-     * @static
-     * @param {number} value 要转换的值
-     * @returns {LongBits} LongBits实例
-     * @memberof LongBits
-     */
-    static fromNumber(value) {
-        let _value = value;
-        const sign = _value < 0;
-
-        if (sign)
-            _value = -_value;
-
-        let lo = _value >>> 0;
-        let hi = (_value - lo) / 4294967296 >>> 0;
-
-        if (sign) {
-            hi = ~hi >>> 0;
-            lo = ~lo >>> 0;
-            if (++lo > 4294967295) {
-                lo = 0;
-                if (++hi > 4294967295)
-                    hi = 0;
-            }
-        }
-
-        return new LongBits(lo, hi);
-    }
 }
 
 /**
@@ -269,6 +221,27 @@ export default class Writer {
      */
     sint32(value) {
         return this.uint32((value << 1 ^ value >> 31) >>> 0);
+    }
+
+    /**
+     * @description 写一个uint64到当前位置
+     * @param {number} value 值
+     * @returns {Writer} this
+     * @memberof Writer
+     */
+    uint64(value) {
+        const bits = LongBits.fromNumber(value);
+        return this._push(writeVarint64, bits.length(), bits);
+    }
+
+    /**
+     * @description 写一个int64到当前位置
+     * @param {number} value 值
+     * @returns {Writer} this
+     * @memberof Writer
+     */
+    int64(value) {
+        this.uint64(value);
     }
 
     /**
