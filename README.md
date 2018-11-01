@@ -13,9 +13,11 @@ Protobuf的js编解码库。
 1. int32
 2. uint32
 3. sint32
-4. bool
-5. string
-6. bytes
+4. int64
+5. uint64
+6. bool
+7. string
+8. bytes
 
 如需增加更多的基本类型，可以fork或者提PR或者issue。
 
