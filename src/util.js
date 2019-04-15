@@ -2,6 +2,7 @@
 
 export default {
     emptyArray: [],
+    emptyObject: {},
     ProtocolError(...args) {
         return new Error(...args);
     },
