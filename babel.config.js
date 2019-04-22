@@ -4,15 +4,15 @@ module.exports = api => {
     const presets = [
         // '@babel/preset-stage-0',
         ['@babel/preset-env', {
-            debug: true,
-            exclude: [
-                'transform-arrow-functions',
-                'transform-destructuring',
-                'transform-block-scoping',
-                'transform-shorthand-properties',
-                'transform-spread',
-                'transform-destructuring'
-            ]
+            debug: true
+            // exclude: [
+            //     'transform-arrow-functions',
+            //     'transform-destructuring',
+            //     'transform-block-scoping',
+            //     'transform-shorthand-properties',
+            //     'transform-spread',
+            //     'transform-destructuring'
+            // ]
         }]
     ];
 
